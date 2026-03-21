@@ -1,12 +1,13 @@
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Login from "@/components/Login";
 import Recovery from "@/components/Recovery";
 import Signup from "@/components/Signup";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Field } from "@/components/ui/field";
+import { Card, CardContent } from "@/components/ui/card";
 import { createAuth, type FirebaseConfig } from "@/config/firebase";
 import { useState } from "react";
+
+export type CurrentScreen = "login" | "signup" | "recovery";
 
 export interface AuthenticationProps {
   appName: string;
@@ -18,9 +19,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
   firebaseConfig,
 }) => {
   const auth = createAuth(firebaseConfig);
-  const [currentScreen, setCurrentScreen] = useState<
-    "login" | "signup" | "recovery"
-  >("login");
+  const [currentScreen, setCurrentScreen] = useState<CurrentScreen>("login");
 
   return (
     <div className="flex h-screen items-center justify-center">
@@ -35,16 +34,10 @@ const Authentication: React.FC<AuthenticationProps> = ({
             <Recovery />
           )}
         </CardContent>
-        <CardFooter>
-          <Field orientation="horizontal">
-            <Button variant="link" id="form-login-signup">
-              Signup
-            </Button>
-            <Button variant="link" id="form-login-forgot">
-              Forgot
-            </Button>
-          </Field>
-        </CardFooter>
+        <Footer
+          currentScreen={currentScreen}
+          setCurrentScreen={setCurrentScreen}
+        />
       </Card>
     </div>
   );
