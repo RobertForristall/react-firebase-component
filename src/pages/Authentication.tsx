@@ -6,10 +6,7 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  CardFooter
 } from "@/components/ui/card"
 import {
   Field,
@@ -19,6 +16,8 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { createAuth, type FirebaseConfig } from "@/config/firebase"
+import { useState } from "react"
+import Header from "@/components/Header"
 
 const formSchema = z.object({
   email: z.email(),
@@ -31,12 +30,12 @@ const formSchema = z.object({
     .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character"),
 })
 
-export interface LoginProps {
+export interface AuthenticationProps {
   appName: string
   firebaseConfig: FirebaseConfig
 }
 
-const Login: React.FC<LoginProps> = ({ appName, firebaseConfig }) => {
+const Authentication: React.FC<AuthenticationProps> = ({ appName, firebaseConfig }) => {
   const auth = createAuth(firebaseConfig)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,18 +44,14 @@ const Login: React.FC<LoginProps> = ({ appName, firebaseConfig }) => {
       password: "",
     },
   })
+  const [currentScreen, setCurrentScreen] = useState<"login" | "signup" | "recovery">("login")
 
   function onSubmit(data: z.infer<typeof formSchema>) {}
 
   return (
     <div className="flex h-screen items-center justify-center">
       <Card className="w-full text-center sm:max-w-md">
-        <CardHeader>
-          <CardTitle>{appName} Login</CardTitle>
-          <CardDescription>
-            Please login using associated account information
-          </CardDescription>
-        </CardHeader>
+        <Header appName={appName} currentScreen={currentScreen}/>
         <CardContent>
           <form id="form-login" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
@@ -130,4 +125,4 @@ const Login: React.FC<LoginProps> = ({ appName, firebaseConfig }) => {
   )
 }
 
-export default Login
+export default Authentication

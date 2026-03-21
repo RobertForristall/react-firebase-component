@@ -1,10 +1,10 @@
 import Dashboard from "./pages/Dashboard"
 import Home from "./pages/Home"
-import Login, { type LoginProps } from "./pages/Login"
+import Authentication, { type AuthenticationProps } from "./pages/Authentication"
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
 
 export function App() {
-  const loginProps: LoginProps = {
+  const loginProps: AuthenticationProps = {
     appName: "Testing",
     firebaseConfig: {
       apiKey: import.meta.env.VITE_PUBLIC_AUTH_API_KEY,
@@ -29,7 +29,7 @@ export function App() {
         <Route
           path="/login"
           element={
-            <Login
+            <Authentication
               appName={loginProps.appName}
               firebaseConfig={loginProps.firebaseConfig}
             />
