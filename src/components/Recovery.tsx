@@ -1,3 +1,4 @@
+import PasswordRecovery from "./PasswordRecovery";
 import { Accordion } from "./ui/accordion";
 import {
   AccordionItem,
@@ -16,7 +17,9 @@ const Recovery: React.FC<RecoveryProps> = ({}) => {
       </AccordionItem>
       <AccordionItem value="returns">
         <AccordionTrigger>Recover Password?</AccordionTrigger>
-        <AccordionContent>Here can recover password</AccordionContent>
+        <AccordionContent>
+          <PasswordRecovery />
+        </AccordionContent>
       </AccordionItem>
     </Accordion>
   );
