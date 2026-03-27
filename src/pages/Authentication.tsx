@@ -36,6 +36,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
             setMessage(
               "User successfully created, please verify your account using the email sent to the provided email.",
             );
+            setCurrentScreen("login");
           })
           .catch((error) => {
             // TODO: Handle issue if verification email is not properly sent
@@ -68,7 +69,10 @@ const Authentication: React.FC<AuthenticationProps> = ({
         </CardContent>
         <Footer
           currentScreen={currentScreen}
-          setCurrentScreen={setCurrentScreen}
+          setCurrentScreen={(newScreen: CurrentScreen) => {
+            setMessage(undefined);
+            setCurrentScreen(newScreen);
+          }}
         />
       </Card>
     </div>
