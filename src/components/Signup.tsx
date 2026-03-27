@@ -16,7 +16,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "./ui/input";
 
-interface SignupProps {}
+interface SignupProps {
+  signupFunction: (email: string, password: string) => void;
+}
 
 const formSchema = z
   .object({
@@ -56,7 +58,7 @@ const formSchema = z
     }
   });
 
-const Signup: React.FC<SignupProps> = ({}) => {
+const Signup: React.FC<SignupProps> = ({ signupFunction }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,7 +72,9 @@ const Signup: React.FC<SignupProps> = ({}) => {
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
 
-  function onSubmit(data: z.infer<typeof formSchema>) {}
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    signupFunction(data.email, data.password);
+  }
 
   return (
     <form id="form-signup" onSubmit={form.handleSubmit(onSubmit)}>
