@@ -14,7 +14,9 @@ import { useState } from "react";
 
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
-interface LoginProps {}
+interface LoginProps {
+  loginFunction: (email: string, password: string) => void;
+}
 
 const formSchema = z.object({
   email: z.email(),
@@ -27,7 +29,7 @@ const formSchema = z.object({
     .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character"),
 });
 
-const Login: React.FC<LoginProps> = ({}) => {
+const Login: React.FC<LoginProps> = ({ loginFunction }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,7 +39,9 @@ const Login: React.FC<LoginProps> = ({}) => {
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  function onSubmit(data: z.infer<typeof formSchema>) {}
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    loginFunction(data.email, data.password);
+  }
 
   return (
     <form id="form-login" onSubmit={form.handleSubmit(onSubmit)}>

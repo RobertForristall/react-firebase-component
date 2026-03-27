@@ -1,7 +1,9 @@
-import Dashboard from "./pages/Dashboard"
-import Home from "./pages/Home"
-import Authentication, { type AuthenticationProps } from "./pages/Authentication"
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
+import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
+import Authentication, {
+  type AuthenticationProps,
+} from "./pages/Authentication";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 export function App() {
   const loginProps: AuthenticationProps = {
@@ -15,7 +17,7 @@ export function App() {
       appId: import.meta.env.VITE_PUBLIC_AUTH_APP_ID,
       measurementId: import.meta.env.VITE_PUBLIC_AUTH_MEASUREMENT_ID,
     },
-  }
+  };
 
   return (
     <BrowserRouter>
@@ -35,10 +37,13 @@ export function App() {
             />
           }
         />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={<Dashboard firebaseConfig={loginProps.firebaseConfig} />}
+        />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -7,9 +7,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { createAuth, type FirebaseConfig } from "@/config/firebase";
 import {
   createUserWithEmailAndPassword,
+  onAuthStateChanged,
   sendEmailVerification,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export type CurrentScreen = "login" | "signup" | "recovery";
 
@@ -23,8 +26,22 @@ const Authentication: React.FC<AuthenticationProps> = ({
   firebaseConfig,
 }) => {
   const auth = createAuth(firebaseConfig);
+  const navigate = useNavigate();
   const [currentScreen, setCurrentScreen] = useState<CurrentScreen>("login");
   const [message, setMessage] = useState<string | undefined>(undefined);
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      if (user.emailVerified) {
+        navigate("/dashboard");
+      } else {
+        // TODO: Handle non-veerified user
+      }
+    } else {
+      // User is signed out
+      console.log("No user is signed in.");
+    }
+  });
 
   const signupFunction = (email: string, password: string) => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -50,6 +67,16 @@ const Authentication: React.FC<AuthenticationProps> = ({
       });
   };
 
+  const loginFunction = (email: string, password: string) => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((res) => {
+        const user = res.user;
+      })
+      .catch((error) => {
+        // TODO: Handle issue if user could not be logged in
+      });
+  };
+
   return (
     <div className="flex h-screen items-center justify-center">
       <Card className="w-full text-center sm:max-w-md">
@@ -60,7 +87,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
         />
         <CardContent>
           {currentScreen == "login" ? (
-            <Login />
+            <Login loginFunction={loginFunction} />
           ) : currentScreen == "signup" ? (
             <Signup signupFunction={signupFunction} />
           ) : (
