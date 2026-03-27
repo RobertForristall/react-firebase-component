@@ -5,11 +5,14 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox";
 import {
   FieldGroup,
   Field,
   FieldLabel,
   FieldError,
+  FieldContent,
+  FieldDescription,
 } from "@/components/ui/field";
 import { Input } from "./ui/input";
 
@@ -32,6 +35,7 @@ const formSchema = z
       .regex(/[a-z]/, "Must contain at least one lowercase letter")
       .regex(/[0-9]/, "Must contain at least one number")
       .regex(/[^a-zA-Z0-9]/, "Must contain at least one special character"),
+    acceptTerms: z.boolean(),
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
@@ -39,6 +43,15 @@ const formSchema = z
         code: "custom",
         message: "The passwords did not match",
         path: ["confirmPassword"],
+      });
+    }
+  })
+  .superRefine(({ acceptTerms }, ctx) => {
+    if (!acceptTerms) {
+      ctx.addIssue({
+        code: "custom",
+        message: "You must agree to the terms and conditions",
+        path: ["acceptTerms"],
       });
     }
   });
@@ -50,6 +63,7 @@ const Signup: React.FC<SignupProps> = ({}) => {
       email: "",
       password: "",
       confirmPassword: "",
+      acceptTerms: false,
     },
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -170,6 +184,32 @@ const Signup: React.FC<SignupProps> = ({}) => {
                     `}</style>
               </div>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
+          name="acceptTerms"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+              <Checkbox
+                id="terms-checkbox-2"
+                name="terms-checkbox-2"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+              <FieldContent>
+                <FieldLabel htmlFor="terms-checkbox-2">
+                  Accept terms and conditions
+                </FieldLabel>
+                <FieldDescription>
+                  By clicking this checkbox, you agree to the terms and
+                  conditions.
+                </FieldDescription>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </FieldContent>
             </Field>
           )}
         />
