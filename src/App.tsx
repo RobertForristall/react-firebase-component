@@ -4,6 +4,9 @@ import Authentication, {
   type AuthenticationProps,
 } from "./pages/Authentication";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Button } from "./components/ui/button";
+import { signOut } from "firebase/auth";
+import { createAuth } from "./config/firebase";
 
 export function App() {
   const loginProps: AuthenticationProps = {
@@ -19,12 +22,15 @@ export function App() {
     },
   };
 
+  const auth = createAuth(loginProps.firebaseConfig);
+
   return (
     <BrowserRouter>
       <nav>
         <Link to="/">Home</Link>
         <Link to="/login">Login</Link>
         <Link to="/dashboard">Dashboard</Link>
+        <Button onClick={() => signOut(auth)}>Sign Out</Button>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />

@@ -10,21 +10,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-interface PasswordRecoveryProps {}
+interface PasswordRecoveryProps {
+  passwordRecoveryFunction: (email: string) => void;
+}
 
 const formSchema = z.object({
   email: z.email(),
 });
 
-function onSubmit(data: z.infer<typeof formSchema>) {}
-
-const PasswordRecovery: React.FC<PasswordRecoveryProps> = ({}) => {
+const PasswordRecovery: React.FC<PasswordRecoveryProps> = ({
+  passwordRecoveryFunction,
+}) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
     },
   });
+
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    passwordRecoveryFunction(data.email);
+  }
+
   return (
     <form id="form-password-recovery" onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>

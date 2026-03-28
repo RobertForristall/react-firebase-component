@@ -9,9 +9,11 @@ import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  type ActionCodeSettings,
 } from "firebase/auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export type CurrentScreen = "login" | "signup" | "recovery";
@@ -30,18 +32,20 @@ const Authentication: React.FC<AuthenticationProps> = ({
   const [currentScreen, setCurrentScreen] = useState<CurrentScreen>("login");
   const [message, setMessage] = useState<string | undefined>(undefined);
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      if (user.emailVerified) {
-        navigate("/dashboard");
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (user.emailVerified) {
+          navigate("/dashboard");
+        } else {
+          // TODO: Handle non-veerified user
+        }
       } else {
-        // TODO: Handle non-veerified user
+        // User is signed out
+        console.log("No user is signed in.");
       }
-    } else {
-      // User is signed out
-      console.log("No user is signed in.");
-    }
-  });
+    });
+  }, []);
 
   const signupFunction = (email: string, password: string) => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -77,6 +81,25 @@ const Authentication: React.FC<AuthenticationProps> = ({
       });
   };
 
+  const passwordRecoveryFunction = (email: string) => {
+    const actionCodeSettings: ActionCodeSettings = {
+      url:
+        (import.meta.env.VITE_HTTP_SECURE ? "https://" : "http://") +
+        import.meta.env.VITE_HOSTNAME +
+        "/login/recovery",
+      handleCodeInApp: true,
+    };
+    sendPasswordResetEmail(auth, email, actionCodeSettings)
+      .then(() => {
+        setMessage(
+          "An email has been sent to recover your account if an account with the associated email is present.",
+        );
+      })
+      .catch(() => {
+        // TODO: Handle issue if password recovery fails to send
+      });
+  };
+
   return (
     <div className="flex h-screen items-center justify-center">
       <Card className="w-full text-center sm:max-w-md">
@@ -91,7 +114,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
           ) : currentScreen == "signup" ? (
             <Signup signupFunction={signupFunction} />
           ) : (
-            <Recovery />
+            <Recovery passwordRecoveryFunction={passwordRecoveryFunction} />
           )}
         </CardContent>
         <Footer

@@ -6,9 +6,11 @@ import {
   AccordionContent,
 } from "./ui/accordion";
 
-interface RecoveryProps {}
+interface RecoveryProps {
+  passwordRecoveryFunction: (email: string) => void;
+}
 
-const Recovery: React.FC<RecoveryProps> = ({}) => {
+const Recovery: React.FC<RecoveryProps> = ({ passwordRecoveryFunction }) => {
   return (
     <Accordion type="single" collapsible className="max-w-lg">
       <AccordionItem value="email">
@@ -18,7 +20,9 @@ const Recovery: React.FC<RecoveryProps> = ({}) => {
       <AccordionItem value="returns">
         <AccordionTrigger>Recover Password?</AccordionTrigger>
         <AccordionContent>
-          <PasswordRecovery />
+          <PasswordRecovery
+            passwordRecoveryFunction={passwordRecoveryFunction}
+          />
         </AccordionContent>
       </AccordionItem>
     </Accordion>
