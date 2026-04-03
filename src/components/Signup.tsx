@@ -167,13 +167,13 @@ const Signup: React.FC<SignupProps> = ({ signupFunction }) => {
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                 >
-                  {showPassword ? (
+                  {showConfirmPassword ? (
                     <EyeIcon className="h-4 w-4" aria-hidden="true" />
                   ) : (
                     <EyeOffIcon className="h-4 w-4" aria-hidden="true" />
                   )}
                   <span className="sr-only">
-                    {showPassword ? "Hide password" : "Show password"}
+                    {showConfirmPassword ? "Hide password" : "Show password"}
                   </span>
                 </Button>
 
