@@ -13,7 +13,6 @@ import {
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  type ActionCodeSettings,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -33,7 +32,8 @@ const Authentication: React.FC<AuthenticationProps> = ({
 
   const mode: string | null = searchParams.get("mode");
   const oobCode: string | null = searchParams.get("oobCode");
-  const lang: string | null = searchParams.get("lang");
+  // TODO: Determine how best to manage language settings for different users
+  // const lang: string | null = searchParams.get("lang");
   const currentScreenParam: string | null = searchParams.get("currentScreen");
 
   const auth = createAuth(firebaseConfig);
@@ -66,7 +66,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
         const user = userCredential.user;
         console.log("Successfully created new user:", user.uid);
         sendEmailVerification(user)
-          .then((res) => {
+          .then(() => {
             setMessage(
               "User successfully created, please verify your account using the email sent to the provided email.",
             );
@@ -83,9 +83,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
 
   const loginFunction = (email: string, password: string) => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((res) => {
-        const user = res.user;
-      })
+      .then(() => {})
       .catch((error) => {
         handleFirebaseError(error.code);
       });
@@ -103,7 +101,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
       });
   };
 
-  const resetPasswordFunction = (password: string, confirmPassword: string) => {
+  const resetPasswordFunction = (password: string) => {
     if (oobCode) {
       confirmPasswordReset(auth, oobCode, password)
         .then((res) => {

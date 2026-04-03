@@ -9,7 +9,7 @@ import { Button } from "./ui/button";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 interface ResetPasswordProps {
-  resetPasswordFunction: (password: string, confirmPassword: string) => void;
+  resetPasswordFunction: (password: string) => void;
 }
 
 const formSchema = z
@@ -54,7 +54,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({
     useState<boolean>(false);
 
   function onSubmit(data: z.infer<typeof formSchema>) {
-    resetPasswordFunction(data.password, data.confirmPassword);
+    resetPasswordFunction(data.password);
   }
   return (
     <form id="form-reset-password" onSubmit={form.handleSubmit(onSubmit)}>
