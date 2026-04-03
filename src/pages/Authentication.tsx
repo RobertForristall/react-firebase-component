@@ -38,11 +38,10 @@ const Authentication: React.FC<AuthenticationProps> = ({
         if (user.emailVerified) {
           navigate("/dashboard");
         } else {
-          // TODO: Handle non-veerified user
+          setMessage(
+            "User has not verified their account, please verify your account using the email sent when signing up.",
+          );
         }
-      } else {
-        // User is signed out
-        console.log("No user is signed in.");
       }
     });
   }, []);
@@ -60,14 +59,11 @@ const Authentication: React.FC<AuthenticationProps> = ({
             setCurrentScreen("login");
           })
           .catch((error) => {
-            // TODO: Handle issue if verification email is not properly sent
+            handleFirebaseError(error.code);
           });
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error("Error creating user:", errorCode, errorMessage);
-        // TODO: Handle issue if user cannot be created
+        handleFirebaseError(error.code);
       });
   };
 
@@ -77,27 +73,60 @@ const Authentication: React.FC<AuthenticationProps> = ({
         const user = res.user;
       })
       .catch((error) => {
-        // TODO: Handle issue if user could not be logged in
+        handleFirebaseError(error.code);
       });
   };
 
   const passwordRecoveryFunction = (email: string) => {
-    const actionCodeSettings: ActionCodeSettings = {
-      url:
-        (import.meta.env.VITE_HTTP_SECURE ? "https://" : "http://") +
-        import.meta.env.VITE_HOSTNAME +
-        "/login/recovery",
-      handleCodeInApp: true,
-    };
-    sendPasswordResetEmail(auth, email, actionCodeSettings)
+    sendPasswordResetEmail(auth, email)
       .then(() => {
         setMessage(
           "An email has been sent to recover your account if an account with the associated email is present.",
         );
       })
-      .catch(() => {
-        // TODO: Handle issue if password recovery fails to send
+      .catch((error) => {
+        handleFirebaseError(error.code);
       });
+  };
+
+  const handleFirebaseError = (errorCode: string) => {
+    console.error(errorCode);
+    if (errorCode === "auth/email-already-exists") {
+      setMessage("An account with the associated email already exists.");
+    }
+    if (errorCode === "auth/invalid-email") {
+      setMessage(
+        "The provided email is invalid, please correct it and attempt to signup again.",
+      );
+    }
+    if (errorCode === "auth/weak-password") {
+      setMessage(
+        "The provided password is too weak, please correct it with the requirements outlined in the password section.",
+      );
+    }
+    if (errorCode === "auth/too-many-requests") {
+      setMessage(
+        "Too many requests have been sent concurrently from this device, please wait before attempting your request again.",
+      );
+    }
+    if (errorCode === "auth/network-request-failed") {
+      // TODO handle retries for the request before notifying the user there is a network error
+      setMessage(
+        "There is a network connectivity issue, please check internet connection before attempting your request again.",
+      );
+    }
+    if (errorCode === "auth/user-token-expired") {
+      // TODO manage requesting that the user reauthenticates
+    }
+    if (
+      errorCode === "auth/invalid-credential" ||
+      errorCode === "auth/user-not-found" ||
+      errorCode === "auth/wrong-password"
+    ) {
+      setMessage(
+        "Provided credentials are not valid, please try again or perform an email recovery.",
+      );
+    }
   };
 
   return (
