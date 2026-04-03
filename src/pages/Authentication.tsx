@@ -2,10 +2,12 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Login from "@/components/Login";
 import Recovery from "@/components/Recovery";
+import ResetPassword from "@/components/ResetPassword";
 import Signup from "@/components/Signup";
 import { Card, CardContent } from "@/components/ui/card";
 import { createAuth, type FirebaseConfig } from "@/config/firebase";
 import {
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendEmailVerification,
@@ -14,9 +16,9 @@ import {
   type ActionCodeSettings,
 } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-export type CurrentScreen = "login" | "signup" | "recovery";
+export type CurrentScreen = "login" | "signup" | "recovery" | "resetPassword";
 
 export interface AuthenticationProps {
   appName: string;
@@ -27,9 +29,21 @@ const Authentication: React.FC<AuthenticationProps> = ({
   appName,
   firebaseConfig,
 }) => {
+  const [searchParams] = useSearchParams();
+
+  const mode: string | null = searchParams.get("mode");
+  const oobCode: string | null = searchParams.get("oobCode");
+  const lang: string | null = searchParams.get("lang");
+  const currentScreenParam: string | null = searchParams.get("currentScreen");
+
   const auth = createAuth(firebaseConfig);
   const navigate = useNavigate();
-  const [currentScreen, setCurrentScreen] = useState<CurrentScreen>("login");
+  const [currentScreen, setCurrentScreen] = useState<CurrentScreen>(() => {
+    if (mode === "resetPassword") return "resetPassword";
+    return currentScreenParam !== null
+      ? (currentScreenParam as CurrentScreen)
+      : "login";
+  });
   const [message, setMessage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -89,6 +103,26 @@ const Authentication: React.FC<AuthenticationProps> = ({
       });
   };
 
+  const resetPasswordFunction = (password: string, confirmPassword: string) => {
+    if (oobCode) {
+      confirmPasswordReset(auth, oobCode, password)
+        .then((res) => {
+          console.log(res);
+          setMessage(
+            "Password successfully reset, please login using the new password!",
+          );
+          setCurrentScreen("login");
+        })
+        .catch((error) => {
+          handleFirebaseError(error.code);
+        });
+    } else {
+      setMessage(
+        "No password reset code could be parsed from the URL, please only update a password following the link sent to your email",
+      );
+    }
+  };
+
   const handleFirebaseError = (errorCode: string) => {
     console.error(errorCode);
     if (errorCode === "auth/email-already-exists") {
@@ -142,6 +176,8 @@ const Authentication: React.FC<AuthenticationProps> = ({
             <Login loginFunction={loginFunction} />
           ) : currentScreen == "signup" ? (
             <Signup signupFunction={signupFunction} />
+          ) : currentScreen == "resetPassword" ? (
+            <ResetPassword resetPasswordFunction={resetPasswordFunction} />
           ) : (
             <Recovery passwordRecoveryFunction={passwordRecoveryFunction} />
           )}
